@@ -1,0 +1,60 @@
+version: "3"
+services:
+  sv-customer:
+    build:
+      context: ../us-sv-customer
+      dockerfile: Dockerfile
+    environment:
+      - 'APP_PORT=8080'
+      - 'APP_ENVIRONMENT=dev'
+      - 'DATABASE_HOST=db_sv_customer'
+      - 'DATABASE_PORT=3306'
+      - 'DATABASE_NAME=db_sv_customer'
+      - 'DATABASE_USERNAME=customer'
+      - 'DATABASE_PASSWORD=password'
+      - 'KAFKA_HOST=kafka-broker'
+      - 'KAFKA_PORT=9092'
+      - 'CONSUL_HOST=consul-discovery'
+      - 'CONSUL_PORT=8500'
+    networks:
+      - private
+
+  sv-account:
+    build:
+      context: ../us-sv-account
+      dockerfile: Dockerfile
+    environment:
+      - 'APP_PORT=8080'
+      - 'APP_ENVIRONMENT=dev'
+      - 'DATABASE_HOST=db_sv_account'
+      - 'DATABASE_PORT=3306'
+      - 'DATABASE_NAME=db_sv_account'
+      - 'DATABASE_USERNAME=account'
+      - 'DATABASE_PASSWORD=password'
+      - 'KAFKA_HOST=kafka-broker'
+      - 'KAFKA_PORT=9092'
+      - 'CONSUL_HOST=consul-discovery'
+      - 'CONSUL_PORT=8500'
+      - 'CUSTOMER_SERVICE_HOST=sv-customer'
+    networks:
+      - private
+
+  sv-gateway:
+    build:
+      context: ../us-sv-gateway
+      dockerfile: Dockerfile
+    environment:
+      - 'APP_PORT=8080'
+      - 'CONSUL_HOST=consul-discovery'
+      - 'CONSUL_PORT=8500'
+    ports:
+      - '8080:8080'
+    networks:
+      - private
+      - public
+
+networks:
+  private:
+    external: true
+  public:
+    external: true

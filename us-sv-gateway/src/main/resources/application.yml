@@ -1,0 +1,38 @@
+server:
+  port: ${APP_PORT:8080}
+
+spring:
+  application:
+    name: us-sv-gateway
+  cloud:
+    consul:
+      config:
+        enabled: false
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        prefer-ip-address: false
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: sv-customer
+          uri: lb://us-sv-customer
+          predicates:
+            - Path=/v1/customers/**
+        - id: sv-account
+          uri: lb://us-sv-account
+          predicates:
+            - Path=/v1/accounts/**
+        - id: sv-account
+          uri: lb://us-sv-account
+          predicates:
+            - Path=/v1/movements/**
+        - id: sv-account
+          uri: lb://us-sv-account
+          predicates:
+            - Path=/v1/report/**
+            - Method=GET
+            - Query=documentNumber, \d+
+            - Query=date, \d{4}-\d{2}-\d{2}
